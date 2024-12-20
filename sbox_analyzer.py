@@ -121,7 +121,7 @@ def main():
     st.set_page_config(page_title="S-Box Analyzer", layout="wide")
     
     # Title and description
-    st.title("📊 Group 3 GUI S-Box Cryptographic Analysis Tool")
+    st.title("📊 Group 3 GUI S-Box Cryptographic Analysis Tools")
     st.markdown("""
     This tool analyzes various cryptographic properties of an S-Box:
     * **NL** (Nonlinearity)
@@ -137,9 +137,27 @@ def main():
     
     if uploaded_file is not None:
         try:
-            # Read S-Box from Excel
+            # Baca S-Box dari Excel dengan validasi
             df = pd.read_excel(uploaded_file)
+            
+            # Validasi format data
+            if df.empty:
+                st.error("File Excel kosong. Mohon upload file dengan data S-Box yang valid.")
+                return
+                
+            # Flatten dan validasi nilai S-Box
             sbox_values = df.values.flatten().tolist()
+            
+            # Validasi jumlah nilai
+            if len(sbox_values) != 256:  # S-Box 8x8 harus memiliki 256 nilai
+                st.error("S-Box harus memiliki 256 nilai (untuk S-Box 8x8). File Anda berisi " + 
+                        f"{len(sbox_values)} nilai.")
+                return
+                
+            # Validasi range nilai
+            if not all(0 <= x < 256 for x in sbox_values):
+                st.error("Semua nilai dalam S-Box harus berada dalam range 0-255.")
+                return
             
             # Display S-Box
             st.subheader("Imported S-Box")
